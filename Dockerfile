@@ -1,14 +1,10 @@
 FROM golang:alpine as builder
 
-ENV GO111MODULE=on \
-    CGO_ENABLED=0 \
-    GOOS=linux \
-    GOARCH=amd64
+ENV CGO_ENABLED=0
 
 WORKDIR /build
 
-COPY go.mod .
-COPY go.sum .
+COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
@@ -16,8 +12,10 @@ COPY . .
 RUN go build -o gimulator cmd/gimulator/main.go
 
 
-FROM alpine
+FROM busybox
 
 WORKDIR /app
 
 COPY --from=builder /build/gimulator gimulator
+
+CMD ["./gimulator"]
